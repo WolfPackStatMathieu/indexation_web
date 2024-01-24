@@ -2,6 +2,7 @@ import concurrent.futures
 import requests
 from bs4 import BeautifulSoup
 import urllib.robotparser
+from urllib.parse import urlparse, urlunparse
 
 # Fonction pour récupérer le contenu d'une URL
 def fetch_url(url):
@@ -13,17 +14,21 @@ def fetch_url(url):
         print(f"Error fetching URL {url}: {e}")
         return None
 
-# Fonction pour extraire les liens d'une page HTML
 # Fonction pour extraire les liens d'une page HTML avec les nouvelles conditions
-def extract_links(html, max_links=5):
+def extract_links(html, max_links=2):
     links = []
     soup = BeautifulSoup(html, 'html.parser')
 
-    # Vérifie le fichier robots.txt pour l'autorisation de l'URL
+    # Fonction pour vérifier l'autorisation dans le fichier robots.txt pour une URL de base
     def is_allowed_by_robots(url):
+        # Extrait la partie de base de l'URL (sans le chemin spécifique)
+        parsed_url = urlparse(url)
+        base_url = urlunparse((parsed_url.scheme, parsed_url.netloc, '', '', '', ''))
+        
         rp = urllib.robotparser.RobotFileParser()
-        rp.set_url(url + "/robots.txt")
+        rp.set_url(base_url + "/robots.txt")
         rp.read()
+        print(f'le site {url} est autorisé: {rp.can_fetch("*", url)}')
         return rp.can_fetch("*", url)
 
     for a_tag in soup.find_all('a', href=True):
@@ -33,7 +38,7 @@ def extract_links(html, max_links=5):
             links.append(link)
     return links
 
-# Fonction pour crawler une URL
+# Fonction pour crawler une URL avec une vérification de la taille maximale d'URL autorisées
 def crawl_url(url):
     print(f"Crawling: {url}")
     html_content = fetch_url(url)
@@ -41,9 +46,11 @@ def crawl_url(url):
         links = extract_links(html_content)
         print(f"Found {len(links)} links on {url}")
         # Vous pouvez ajouter ici la logique pour traiter les liens, les stocker, etc.
+        return links
+    return []
 
 # Fonction principale pour exécuter le crawler avec plusieurs threads
-def run_crawler(seed_url, max_threads=5, max_allowed_urls=50):
+def run_crawler(seed_url, max_threads=5, max_allowed_urls=5):
     with concurrent.futures.ThreadPoolExecutor(max_threads) as executor:
         # Lance le crawling pour la seed URL
         executor.submit(crawl_url, seed_url)
@@ -67,6 +74,12 @@ def run_crawler(seed_url, max_threads=5, max_allowed_urls=50):
                             num_allowed_urls += 1
                             future = executor.submit(crawl_url, link)
                             futures.add(future)
+
+        # Affiche le nombre d'URL autorisées et les URL en question
+        print(f"\nNombre d'URL autorisées visitées : {num_allowed_urls}")
+        print("Liste des URL autorisées visitées :")
+        for url in visited_urls:
+            print(url)
 
 if __name__ == "__main__":
     seed_url = "http://www.ensai.fr"
