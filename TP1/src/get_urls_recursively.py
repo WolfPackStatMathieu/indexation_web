@@ -3,6 +3,14 @@ from bs4 import BeautifulSoup
 
 
 def get_all_entries_from_xml(url) :
+    """retourne toutes les urls d'un site à partir de sa page /site_map_index.xml
+
+    Args:
+        url (string): monsite/site_map_index.xml
+
+    Returns:
+        list: liste de toutes les urls d'un même site web
+    """
     r = requests.get(url)
     soup = BeautifulSoup(r.text, "xml")
 
@@ -50,5 +58,6 @@ if __name__=='__main__':
             
     for url in all_urls_recursively : 
         print(url)
+    print(type(all_urls_recursively))
     
     
