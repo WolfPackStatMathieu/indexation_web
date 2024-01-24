@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 from urllib.robotparser import RobotFileParser
 
-from TP1.robot import *
+from TP1.src.robot import *
 
 
 

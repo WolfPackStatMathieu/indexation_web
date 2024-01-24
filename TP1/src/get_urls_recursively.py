@@ -2,7 +2,11 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def get_all_entries_from_xml(url) :
+import requests
+from bs4 import BeautifulSoup
+from http.client import IncompleteRead
+
+def get_all_entries_from_xml(url, max_retries=3):
     """retourne toutes les urls d'un site à partir de sa page /site_map_index.xml
 
     Args:
@@ -11,22 +15,32 @@ def get_all_entries_from_xml(url) :
     Returns:
         list: liste de toutes les urls d'un même site web
     """
-    r = requests.get(url)
-    soup = BeautifulSoup(r.text, "xml")
+    for retry in range(max_retries):
+        try:
+            with requests.get(url) as r:
+                r.raise_for_status()
+                soup = BeautifulSoup(r.text, "xml")
 
-    # URLS
-    all_url_tags = soup.find_all("url")
-    allUrls = []
-    for urls in all_url_tags :
-        allUrls.append(urls.findNext("loc").text)
+                all_url_tags = soup.find_all("url")
+                allUrls = [urls.findNext("loc").text for urls in all_url_tags]
 
-    # SITEMAPS
-    sitemapList = soup.find_all("sitemap")
-    allSitemaps = []
-    for sitemap in sitemapList:
-        allSitemaps.append(sitemap.findNext("loc").text)
+                sitemapList = soup.find_all("sitemap")
+                allSitemaps = [sitemap.findNext("loc").text for sitemap in sitemapList]
 
-    return ({"sitemaps" : allSitemaps, "urls" : allUrls})
+                return {"sitemaps": allSitemaps, "urls": allUrls}
+
+        except IncompleteRead as e:
+            print(f"Error during request to {url}: {e}")
+            print(f"Retrying ({retry + 1}/{max_retries})...")
+            continue
+
+        except requests.exceptions.RequestException as e:
+            print(f"Error during request to {url}: {e}")
+            return {"sitemaps": [], "urls": []}
+
+    print(f"Max retries reached for {url}")
+    return {"sitemaps": [], "urls": []}
+
 
 def get_urls_recursively(url) :
     xml = get_all_entries_from_xml(url)
