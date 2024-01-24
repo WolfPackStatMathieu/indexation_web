@@ -42,7 +42,8 @@ def extract_links(html, max_links=5):
         print(len(links))
         is_allowed = is_allowed_by_robots(link)
         if is_allowed:
-            if len(links) < max_links:
+            print(urlparse(link).scheme + "://" + urlparse(link).netloc)
+            if len(links) < max_links and urlparse(link).scheme + "://" + urlparse(link).netloc != base_url:
                 
                 links.append(link)
             else:
