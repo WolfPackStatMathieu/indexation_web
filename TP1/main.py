@@ -1,14 +1,15 @@
 from bs4 import BeautifulSoup
 import urllib.request
 
-
+###### phase d'initialisation ######
+# lecture du site Ensai.fr
 url_base ='http://ensai.fr'
 with urllib.request.urlopen(url_base) as f:
     html_doc = f.read().decode('utf-8')
 
 soup = BeautifulSoup(html_doc, 'html.parser')
 
-
+# remplissage des url
 mes_href = []
 for link in soup.find_all('a'):
     mes_href.append(link.get('href'))
@@ -16,11 +17,9 @@ for link in soup.find_all('a'):
 
 print(len(mes_href))
 
-
-liste_url_final=[]
-liste_url_final.append(mes_href[:5])
-
-
 # si c'est True, alors on lance Beautifulsoup et 
 # on récupère les href
+
+
+
 
