@@ -14,5 +14,9 @@ def robots_entre(url_base):
     url_robot = url_base + "/robots.txt"
     rp.set_url(url_robot)
     rp.read()
+    result = rp.can_fetch("*", url_base)
+    return result
 
-    return rp.can_fetch("*", url_base)
+if __name__ == '__main__':
+    import urllib.robotparser
+    print(robots_entre("https://www.facebook.com"))

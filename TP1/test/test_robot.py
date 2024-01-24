@@ -1,7 +1,11 @@
 import unittest
 from unittest.mock import patch
 from urllib.robotparser import RobotFileParser
-from your_module import robots_entre
+
+from TP1.robot import *
+
+
+
 
 class TestRobotsEntre(unittest.TestCase):
 
@@ -9,7 +13,7 @@ class TestRobotsEntre(unittest.TestCase):
     @patch.object(RobotFileParser, 'set_url')
     def test_robots_entre_allow(self, mock_set_url, mock_read):
         # Arrange
-        url_base = "http://www.example.com"
+        url_base = "http://www.ensai.fr"
         mock_set_url.return_value = None
         mock_read.return_value = None
 
