@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 import urllib.robotparser
-from robot import robots_entre
 from urllib.parse import  urlparse, urlunparse
 from get_url_base import *
 
