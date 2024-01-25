@@ -27,6 +27,13 @@ class Domaine(Base):
     # Relationship with Page
     pages = relationship("Page", back_populates="domaine")
 
+class Frontiere(Base):
+    __tablename__ = 'frontieres'
+    
+    id = Column(Integer, primary_key=True)
+    url = Column(String)
+    
+    
 # Création de la base de données et de la structure
 engine = create_engine('sqlite:///example.db', echo=True)
 Base.metadata.create_all(bind=engine)
