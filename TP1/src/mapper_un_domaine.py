@@ -84,7 +84,6 @@ if __name__ == '__main__':
     # Créer la session une fois avant d'appeler la fonction
     session = create_session()
     import sys
-    
     from get_urls_recursively import get_urls_recursively
     from get_url_base import get_url_base
     domaine = 'https://ensai.fr'

@@ -28,45 +28,11 @@ url='https://ensai.fr'
 url_base = get_url_base(url)
 is_allowed = is_allowed_by_robots(url)
 
-robot_example = Robot(autorise=is_allowed)
-session.add(robot_example)
-session.commit()
+
 
 domaine_1 = Domaine(url_base=url_base, robot=robot_example)
 session.add(domaine_1)
 session.commit()
-
-
-# récupération de toutes les pages du site
-url_base_sitemap = url_base + "/sitemap_index.xml"
-all_urls_recursively = get_urls_recursively(url_base_sitemap)
-# print(all_urls_recursively)
-
-# Initialisation 
-links_page_web = set()
-links_autorisés = set()
-links_interdits = set()
-
-# pseudo code:
-# fonction récupérer_links_d'un_site(liste: liste des url d'un site): Return: liste: liste des links autorisées, liste
-# des links interdits et liste des 
-# pour chaque page on va récupérer les urls:
-# links_page_web = []
-# links_autorisés = []
-# links_interdits = []
-
-# pour chaque url dans all_url_recursively FAIRE
-#   hrefs = récupérer l'ensemble des href de l'url
-#   POUR CHAQUE href dans hrefs:
-        # url_base = récupérer l'url de la page web de href (get_url_base() )
-        # est_autorisé = vérifier si url_base est autorisée par son robot.txt
-        # SI est_autorisé == TRUE ALORS
-            # ajouter url_base à links_autorisés (links_autorisés.add(url_base))
-            # ajouter href dans links_page_web
-        # SINON ALORS
-            # ajouter url_base à links_interdits
-            
-
 
 
 
