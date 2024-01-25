@@ -1,39 +1,19 @@
 import time 
 import concurrent.futures
-import requests
+
 from bs4 import BeautifulSoup
 import urllib.robotparser
 from urllib.parse import urlparse, urlunparse
 from queue import Queue
-
-# Fonction pour récupérer le contenu d'une URL
-def fetch_url(url):
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        return response.text
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching URL {url}: {e}")
-        return None
+from src.get_url_base import get_url_base
+from src.fetch_url import *
+from src.is_allowed_by_robots import *
 
 
 # Fonction pour extraire les liens d'une page HTML avec les nouvelles conditions
 def extract_links(html, max_links=5):
     links = []
     soup = BeautifulSoup(html, 'html.parser')
-
-    # Fonction pour vérifier l'autorisation dans le fichier robots.txt pour une URL de base
-    def is_allowed_by_robots(url):
-        # Extrait la partie de base de l'URL (sans le chemin spécifique)
-        parsed_url = urlparse(url)
-        base_url = urlunparse((parsed_url.scheme, parsed_url.netloc, '', '', '', ''))
-        
-        rp = urllib.robotparser.RobotFileParser()
-        rp.set_url(base_url + "/robots.txt")
-        rp.read()
-        print(f'le site {url} est autorisé: {rp.can_fetch("*", url)}')
-        return rp.can_fetch("*", url)
-    
         
     for a_tag in soup.find_all('a', href=True):
         link = a_tag['href']

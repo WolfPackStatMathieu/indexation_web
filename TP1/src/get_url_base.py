@@ -4,7 +4,14 @@ retourne une string constituée du protocole et du nom de domaine.
 from urllib.parse import urlparse, urlunparse
 
 def get_url_base(url):
-    
+    """retourne à partir d'une url une string constituée du protocole et le nom de domaine
+
+    Args:
+        url (string): une url plus ou moins longue
+
+    Returns:
+        string: protocole + nom de domaine
+    """
     # Extrait la partie de base de l'URL (sans le chemin spécifique)
     parsed_url = urlparse(url)
     url_base = urlunparse((parsed_url.scheme, parsed_url.netloc, '', '', '', ''))
