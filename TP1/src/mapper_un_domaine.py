@@ -9,7 +9,6 @@ print(sys.path)
 
 from get_urls_recursively import get_urls_recursively
 from get_url_base import get_url_base
-from get_hrefs_from_url import get_hrefs_from_url
 from fetch_url import fetch_url
 from classes.classes import Base, Domaine, Page
 
