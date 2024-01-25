@@ -10,7 +10,14 @@ url_base ='https://ensai.fr'
 url_base_sitemap = url_base + "/sitemap_index.xml"
 all_urls_recursively = get_urls_recursively(url_base_sitemap)
 print(all_urls_recursively)
-# pour chaque page on va récupérer les urls
+# pseudo code:
+# fonction récupérer_links_d'un_site(liste: liste des url d'un site): Return: liste: liste des links autorisées
+# pour chaque page on va récupérer les urls:
+# links_autorisés = []
+# links_interdits = []
+
+# pour chaque url dans all_url_recursively FAIRE
+#   liste_href    
 
 
 
