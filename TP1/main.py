@@ -7,7 +7,8 @@ from src.get_urls_recursively import *
 # lecture du site Ensai.fr
 url_base ='https://ensai.fr'
 # récupération de toutes les pages du site
-all_urls_recursively = get_urls_recursively(url_base)
+url_base_sitemap = url_base + "/sitemap_index.xml"
+all_urls_recursively = get_urls_recursively(url_base_sitemap)
 print(all_urls_recursively)
 # pour chaque page on va récupérer les urls
 
