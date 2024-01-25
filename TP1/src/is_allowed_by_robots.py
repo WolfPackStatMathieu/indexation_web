@@ -1,7 +1,9 @@
 """Fonction pour vérifier l'autorisation dans le fichier robots.txt pour une URL de base
 """
 import urllib.robotparser
-from get_url_base import *
+from get_url_base import get_url_base
+
+
 def is_allowed_by_robots(url):
     """permet de savoir si un site web autorise un robot à le crawler
 
