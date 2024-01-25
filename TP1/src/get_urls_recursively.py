@@ -7,27 +7,27 @@ from bs4 import BeautifulSoup
 from http.client import IncompleteRead
 
 def get_all_entries_from_xml(url, max_retries=3):
-    """retourne toutes les urls d'un site à partir de sa page /site_map_index.xml
+    """Retourne toutes les URLs d'un site et les dates de dernière modification à partir de sa page /site_map_index.xml.
 
     Args:
-        url (string): monsite/site_map_index.xml
+        url (string): URL du sitemap, typiquement monsite.com/sitemap.xml
 
     Returns:
-        list: liste de toutes les urls d'un même site web
+        dict: Dictionnaire avec les clés 'sitemaps' et 'urls', contenant respectivement les URLs des sitemaps et des pages avec leur date de dernière modification.
     """
     for retry in range(max_retries):
         try:
-            with requests.get(url) as r:
-                r.raise_for_status()
-                soup = BeautifulSoup(r.text, "xml")
+            response = requests.get(url)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, "xml")
 
-                all_url_tags = soup.find_all("url")
-                allUrls = [urls.findNext("loc").text for urls in all_url_tags]
+            all_url_tags = soup.find_all("url")
+            allUrls = [(url_tag.find("loc").text, url_tag.find("lastmod").text if url_tag.find("lastmod") else "Non disponible") for url_tag in all_url_tags]
 
-                sitemapList = soup.find_all("sitemap")
-                allSitemaps = [sitemap.findNext("loc").text for sitemap in sitemapList]
+            sitemapList = soup.find_all("sitemap")
+            allSitemaps = [(sitemap_tag.find("loc").text, sitemap_tag.find("lastmod").text if sitemap_tag.find("lastmod") else "Non disponible") for sitemap_tag in sitemapList]
 
-                return {"sitemaps": allSitemaps, "urls": allUrls}
+            return {"sitemaps": allSitemaps, "urls": allUrls}
 
         except IncompleteRead as e:
             print(f"Error during request to {url}: {e}")
@@ -41,26 +41,42 @@ def get_all_entries_from_xml(url, max_retries=3):
     print(f"Max retries reached for {url}")
     return {"sitemaps": [], "urls": []}
 
+# # Test the function
+# sitemap_url = "https://www.ensai.fr/sitemap_index.xml"  # Replace with the actual sitemap URL
+# sitemap_data = get_urls_recursively(sitemap_url)
+# print(sitemap_data)
 
-def get_urls_recursively(url) :
+def get_urls_recursively(url):
     xml = get_all_entries_from_xml(url)
-    allUrls = xml['urls']
+    allUrlsWithDates = xml['urls']  # Liste des tuples (URL, date de dernière modification)
     sitemaps = xml['sitemaps']
     visitedSitemaps = []
 
-    while (sitemaps) :
-        for sitemap in sitemaps :
-            if sitemap not in visitedSitemaps :
+    while sitemaps:
+        newSitemaps = []  # Pour stocker les nouveaux sitemaps trouvés dans cette itération
+        for sitemap, _ in sitemaps:
+            if sitemap not in visitedSitemaps:
                 visitedSitemaps.append(sitemap)
                 xml = get_all_entries_from_xml(sitemap)
-                sitemaps.extend(xml['sitemaps'])
+                newSitemaps.extend(xml['sitemaps'])
 
-                for elt in xml['urls'] :
-                    allUrls.append(elt)
-            else :
-                sitemaps.remove(sitemap)
+                for url, lastmod in xml['urls']:
+                    allUrlsWithDates.append((url, lastmod))
+        sitemaps = newSitemaps  # Mettre à jour la liste des sitemaps à visiter
 
-    return(allUrls)
+    return allUrlsWithDates
+
+# if __name__ == '__main__':
+#     # Scraper récursivement toutes les URLs à partir d'un sitemap ou index de sitemap
+#     all_urls_recursively = get_urls_recursively("https://ensai.fr/sitemap_index.xml")
+
+#     with open("urls.txt", "w+") as f:
+#         for url, lastmod in all_urls_recursively:
+#             f.write(f"{url}, Last Modified: {lastmod}\n")
+            
+#     for url, lastmod in all_urls_recursively:
+#         print(f"{url}, Last Modified: {lastmod}")
+#     print(type(all_urls_recursively))
 
 if __name__=='__main__':
     # Scraper récursivement toutes les URLs à partir d'un sitemap ou index de sitemap
