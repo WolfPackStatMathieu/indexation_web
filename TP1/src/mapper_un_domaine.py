@@ -4,20 +4,13 @@ et où chaque page a un ensemble de Href autorisés ou non
 import sys
 import datetime
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-print(sys.path)
-
+from sqlalchemy.orm import sessionmaker, joinedload
 from get_urls_recursively import get_urls_recursively
 from get_url_base import get_url_base
 from fetch_url import fetch_url
-from classes.classes import Base, Domaine, Page
+from classes.classes import Base, Domaine, Page, Frontiere
+from create_session import create_session
 
-def create_session():
-    db_path = "sqlite:///example.db"
-    engine = create_engine(db_path, echo=True)
-    Base.metadata.create_all(bind=engine)
-    Session = sessionmaker(bind=engine)
-    return Session()
 
 
 def mapper_un_domaine(url_domaine, session):
@@ -30,6 +23,15 @@ def mapper_un_domaine(url_domaine, session):
     # print(all_urls_recursively)
 
     # Initialisation 
+    frontieres = set()
+    
+    # Récupérer toutes les frontières de la base de données
+    all_frontieres = session.query(Frontiere).all()
+    
+    for frontiere in all_frontieres:
+        frontieres.add(frontiere.url)
+    
+    
     links_page_web = set() # on stocke les pages du domaine en cours
     links_autorisés = set() # on stocke les liens dont le domaine est autorisé
     links_interdits = set() # on stocke les liens dont le domaine est interdit
