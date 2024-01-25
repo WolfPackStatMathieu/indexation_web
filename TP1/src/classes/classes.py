@@ -1,54 +1,59 @@
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy.orm import declarative_base, relationship
 from datetime import datetime
 
-class Href:
-    def __init__(self, url, est_autorise):
-        self.url = url
-        self.est_autorise = est_autorise
-        self.pages = []  # Liste vide pour stocker les objets Page liés
+Base = declarative_base()
 
-class Page:
-    def __init__(self, url, contenu_html, age):
-        self.url = url
-        self.contenu_html = contenu_html
-        self.age = age
-        self.domaine = None  # L'objet Domaine sera associé plus tard
-        self.hrefs = []  # Liste vide pour stocker les objets Href liés
+class Href(Base):
+    __tablename__ = 'hrefs'
 
-class Robot:
-    def __init__(self, autorise):
-        self.autorise = autorise
+    id = Column(Integer, primary_key=True)
+    url = Column(String)
+    est_autorise = Column(Boolean)
+    
+    # Relationship with Page
+    pages = relationship("Page", secondary="page_href_association")
 
-class Domaine:
-    def __init__(self, url_base, robot):
-        self.url_base = url_base
-        self.pages = []  # Liste vide pour stocker les objets Page liés
-        self.robot = robot  # robot doit être un objet de la classe Robot
+class Page(Base):
+    __tablename__ = 'pages'
 
-    def ajouter_page(self, page):
-        # Assigne le domaine à la page et ajoute la page à la liste
-        page.domaine = self
-        self.pages.append(page)
+    id = Column(Integer, primary_key=True)
+    url = Column(String)
+    contenu_html = Column(String)
+    age = Column(DateTime)
+    
+    # Relationship with Domaine
+    domaine_id = Column(Integer, ForeignKey('domaines.id'))
+    domaine = relationship("Domaine", back_populates="pages")
 
-# # Exemple d'utilisation :
-# # Création d'un objet Robot
-# robot_example = Robot(autorise=True)
+    # Relationship with Href
+    hrefs = relationship("Href", secondary="page_href_association")
 
-# # Création d'un objet Domaine
-# domaine_example = Domaine(url_base="http://example.com", robot=robot_example)
+class PageHrefAssociation(Base):
+    __tablename__ = 'page_href_association'
 
-# # Création d'un objet Page
-# page_example = Page(url="http://example.com/page1", contenu_html="<html>...</html>", age=datetime.now())
+    page_id = Column(Integer, ForeignKey('pages.id'), primary_key=True)
+    href_id = Column(Integer, ForeignKey('hrefs.id'), primary_key=True)
 
-# # Ajout de la page à la liste des pages du domaine
-# domaine_example.ajouter_page(page_example)
+class Robot(Base):
+    __tablename__ = 'robots'
 
-# # Création d'un objet Href
-# href_example = Href(url="http://example.com/link1", est_autorise=True)
+    id = Column(Integer, primary_key=True)
+    autorise = Column(Boolean)
 
-# # Ajout de la page à la liste des pages liées à l'href
-# href_example.pages.append(page_example)
+class Domaine(Base):
+    __tablename__ = 'domaines'
 
-# # Vous pouvez maintenant accéder aux pages, hrefs et domaines associés comme suit :
-# # domaine_example.pages
-# # page_example.hrefs
-# # href_example.pages
+    id = Column(Integer, primary_key=True)
+    url_base = Column(String)
+    
+    # Relationship with Page
+    pages = relationship("Page", back_populates="domaine")
+
+    # Relationship with Robot
+    robot_id = Column(Integer, ForeignKey('robots.id'))
+    robot = relationship("Robot")
+
+# Création de la base de données et de la structure
+engine = create_engine('sqlite:///example.db', echo=True)
+Base.metadata.create_all(bind=engine)
