@@ -727,6 +727,6 @@ https://ensai.fr/category/ecole/
 https://ensai.fr/category/non-classifiee/
 https://ensai.fr/category/programmes-2/
 https://ensai.fr/category/recherche-innovation/
-https://ensai.fr/category/video-en-2/
 https://ensai.fr/category/videos/
+https://ensai.fr/category/video-en-2/
 https://ensai.fr/category/vie-etudiante/

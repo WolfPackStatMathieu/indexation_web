@@ -2,12 +2,13 @@ import time
 import concurrent.futures
 
 from bs4 import BeautifulSoup
-import urllib.robotparser
+
 from urllib.parse import urlparse, urlunparse
 from queue import Queue
 from src.get_url_base import get_url_base
 from src.fetch_url import *
 from src.is_allowed_by_robots import *
+import src
 
 
 # Fonction pour extraire les liens d'une page HTML avec les nouvelles conditions
