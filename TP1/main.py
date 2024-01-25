@@ -28,19 +28,10 @@ url='https://ensai.fr'
 url_base = get_url_base(url)
 is_allowed = is_allowed_by_robots(url)
 
-
-
-domaine_1 = Domaine(url_base=url_base, robot=robot_example)
+domaine_1 = Domaine(url_base=url_base)
 session.add(domaine_1)
 session.commit()
 
-
-
-
-# # Exemple d'utilisation : création d'un objet Robot et ajout à la base de données
-# robot_example = Robot(autorise=True)
-# session.add(robot_example)
-# session.commit()
 
 # # Exemple d'utilisation : création d'un objet Domaine avec un objet Robot associé
 # domaine_example = Domaine(url_base="http://example.com", robot=robot_example)
@@ -54,11 +45,6 @@ session.commit()
 # session.add(page_example)
 # session.commit()
 
-# # Exemple d'utilisation : création d'un objet Href et association avec un objet Page
-# href_example = Href(url="http://example.com/link1", est_autorise=True)
-# href_example.pages.append(page_example)
-# session.add(href_example)
-# session.commit()
 
 # N'oubliez pas de fermer la session après avoir terminé
 session.close()

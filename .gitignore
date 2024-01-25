@@ -4,4 +4,8 @@ TP1.pdf
 Indexation Web - ENSAI.pdf
 *__pycache__*
 example.db
+<<<<<<< HEAD
 urls.txt
+=======
+urls.txt
+>>>>>>> be60bc7e5b796489f3607bfb4e6158f566730ed5

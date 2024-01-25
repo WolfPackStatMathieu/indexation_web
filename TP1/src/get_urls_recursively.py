@@ -47,6 +47,14 @@ def get_all_entries_from_xml(url, max_retries=3):
 # print(sitemap_data)
 
 def get_urls_recursively(url):
+    """retourne la liste de tuple (url, date de dernière mise à jour)
+
+    Args:
+        url (string): une url de finissant par /sitemap_index.xml
+
+    Returns:
+        list: list[tuples(url, date)]
+    """
     xml = get_all_entries_from_xml(url)
     allUrlsWithDates = xml['urls']  # Liste des tuples (URL, date de dernière modification)
     sitemaps = xml['sitemaps']
@@ -82,9 +90,7 @@ if __name__ == '__main__':
     # Scraper récursivement toutes les URLs à partir d'un sitemap ou index de sitemap
     all_urls_recursively = get_urls_recursively("https://ensai.fr/sitemap_index.xml")
 
-    with open("urls.txt", "w+") as f:
-        for url, lastmod in all_urls_recursively:
-            f.write(f"{url}, Last Modified: {lastmod}\n")
+
             
     for url, lastmod in all_urls_recursively:
         print(f"{url}, Last Modified: {lastmod}")
