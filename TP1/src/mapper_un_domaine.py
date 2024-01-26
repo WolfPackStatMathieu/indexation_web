@@ -15,8 +15,7 @@ from get_pages_for_domain import get_pages_for_domain
 
 
 def mapper_un_domaine(domaine, session):
-    """prend un domaine, va chercher ses url, enregistre au plus 5 pages en base, et met à jour la frontière
-
+    """prend un domaine et retourne ses url et date de modifications
     Args:
         domaine (Domaine): le Domaine à mapper
         session (session): la session en cours pour la base de donnée
@@ -28,61 +27,7 @@ def mapper_un_domaine(domaine, session):
     url_base_sitemap = get_url_sitemap_index(url_base)
     all_urls_recursively = get_urls_recursively(url_base_sitemap)
 
-    # récupération de toutes les Pages du Domaine
-    pages = get_pages_for_domain(session, domaine.id)
-    
-    # Initialisation 
-    frontieres = set()
-    
-    # Récupérer toutes les frontières de la base de données
-    all_frontieres = session.query(Frontiere).all()
-    
-    for frontiere in all_frontieres:
-        frontieres.add(frontiere.url)
-    
-    
-    links_page_web = set() # on stocke les pages du domaine en cours
-    links_autorisés = set() # on stocke les liens dont le domaine est autorisé
-    links_interdits = set() # on stocke les liens dont le domaine est interdit
-
-    # pseudo code:
-    # fonction récupérer_links_d'un_site(liste: liste des url d'un site): Return: liste: liste des links autorisées, liste
-    # des links interdits et liste des 
-    # pour chaque page on va récupérer les urls:
-    
-    for page, lastmod in all_urls_recursively:
-        contenu_html_page = fetch_url(page) 
-        ma_page = Page(url=page, contenu_html=contenu_html_page, age=lastmod)
-        ma_page.domaine = domaine
-
-        session.add(ma_page)
-        session.commit()
-    
-        # hrefs = get_hrefs_from_url(page)
-        # for href in hrefs:
-        #     url_base = get_url_base(href)
-        #     est_autorise = est_autorise(url_base)
-        #     if est_autorise:
-        #         href_example = Href(url=href, est_autorise=True)
-        #         href_example.pages.append(page)
-        #         # session.add(href_example)
-        #         # session.commit()
-
-
-    # pour chaque url dans all_url_recursively FAIRE
-    #   hrefs = récupérer l'ensemble des href de l'url
-    #   POUR CHAQUE href dans hrefs:
-            # url_base = récupérer l'url de la page web de href (get_url_base() )
-            # est_autorisé = vérifier si url_base est autorisée par son robot.txt
-            # SI est_autorisé == TRUE ALORS
-                # ajouter url_base à links_autorisés (links_autorisés.add(url_base))
-                # ajouter href dans links_page_web
-            # SINON ALORS
-                # ajouter url_base à links_interdits
-                
-
-
-    pass
+    return all_urls_recursively
 
 if __name__ == '__main__':
     # Créer la session une fois avant d'appeler la fonction
@@ -90,7 +35,11 @@ if __name__ == '__main__':
     import sys
     from get_urls_recursively import get_urls_recursively
     from get_url_base import get_url_base
-    domaine = 'https://ensai.fr'
-    mapper_un_domaine(url_domaine=domaine, session=session)
+    
+    url_domaine = 'https://ensai.fr'
+    print(url_domaine)
+    domaine  = session.query(Domaine).filter_by(url_base=url_domaine).first()
+
+    print(mapper_un_domaine(domaine=domaine, session=session))
     
     session.close()
