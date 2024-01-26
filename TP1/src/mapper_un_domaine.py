@@ -18,17 +18,17 @@ def mapper_un_domaine(domaine, session):
     """prend un domaine, va chercher ses url, enregistre au plus 5 pages en base, et met à jour la frontière
 
     Args:
-        domaine (DOmaine): le Domaine à mapper
+        domaine (Domaine): le Domaine à mapper
         session (session): la session en cours pour la base de donnée
     """
     
     url_domaine = domaine.url_base
     url_base = get_url_base(url_domaine)
-    # récupération de toutes les pages du site
+    # récupération de toutes les url du site (avec leur date de last modification)
     url_base_sitemap = get_url_sitemap_index(url_base)
     all_urls_recursively = get_urls_recursively(url_base_sitemap)
-    # print(all_urls_recursively)
 
+    # récupération de toutes les Pages du Domaine
     # Initialisation 
     frontieres = set()
     

@@ -6,21 +6,9 @@ from src.get_url_base import get_url_base
 from src.is_allowed_by_robots import is_allowed_by_robots
 from src.get_urls_recursively import get_urls_recursively
 from src.classes.classes import Base, Page, Domaine, Frontiere
+from src.create_session import create_session
 
-# Chemin vers le fichier de base de données SQLite
-db_path = "sqlite:///example.db"
-
-# Création du moteur de la base de données
-engine = create_engine(db_path, echo=True)
-
-# Création des tables s'il n'existent pas encore
-Base.metadata.create_all(bind=engine)
-
-# Création d'une session pour interagir avec la base de données
-Session = sessionmaker(bind=engine)
-session = Session()
-
-
+session = create_session()
 
 ###### phase d'initialisation ######
 # lecture du site Ensai.fr
