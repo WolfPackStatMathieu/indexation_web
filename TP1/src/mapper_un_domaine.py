@@ -11,7 +11,7 @@ from fetch_url import fetch_url
 from classes.classes import Base, Domaine, Page, Frontiere
 from create_session import create_session
 from get_url_sitemap_index import get_url_sitemap_index
-
+from get_pages_for_domain import get_pages_for_domain
 
 
 def mapper_un_domaine(domaine, session):
@@ -29,6 +29,8 @@ def mapper_un_domaine(domaine, session):
     all_urls_recursively = get_urls_recursively(url_base_sitemap)
 
     # récupération de toutes les Pages du Domaine
+    pages = get_pages_for_domain(session, domaine.id)
+    
     # Initialisation 
     frontieres = set()
     

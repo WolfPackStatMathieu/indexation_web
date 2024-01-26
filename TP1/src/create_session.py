@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from classes.classes import Base
+from src.classes.classes import Base
 
 def create_session():
     db_path = "sqlite:///example.db"

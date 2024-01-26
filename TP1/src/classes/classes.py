@@ -47,7 +47,4 @@ class Frontiere(Base):
         UniqueConstraint('url', name='unique_url'),
     )
     
-    
-# Création de la base de données et de la structure
-engine = create_engine('sqlite:///example.db', echo=True)
-Base.metadata.create_all(bind=engine)
+
