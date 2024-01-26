@@ -10,15 +10,22 @@ from get_url_base import get_url_base
 from fetch_url import fetch_url
 from classes.classes import Base, Domaine, Page, Frontiere
 from create_session import create_session
+from get_url_sitemap_index import get_url_sitemap_index
 
 
 
-def mapper_un_domaine(url_domaine, session):
+def mapper_un_domaine(domaine, session):
+    """prend un domaine, va chercher ses url, enregistre au plus 5 pages en base, et met à jour la frontière
+
+    Args:
+        domaine (DOmaine): le Domaine à mapper
+        session (session): la session en cours pour la base de donnée
+    """
     
-        
+    url_domaine = domaine.url_base
     url_base = get_url_base(url_domaine)
     # récupération de toutes les pages du site
-    url_base_sitemap = url_base + "/sitemap_index.xml"
+    url_base_sitemap = get_url_sitemap_index(url_base)
     all_urls_recursively = get_urls_recursively(url_base_sitemap)
     # print(all_urls_recursively)
 
@@ -40,21 +47,15 @@ def mapper_un_domaine(url_domaine, session):
     # fonction récupérer_links_d'un_site(liste: liste des url d'un site): Return: liste: liste des links autorisées, liste
     # des links interdits et liste des 
     # pour chaque page on va récupérer les urls:
-    for page in all_urls_recursively:
+    
+    for page, lastmod in all_urls_recursively:
         contenu_html_page = fetch_url(page) 
-        
-        # trouver l'id du domaine correspondant url_base
-        domaine = session.query(Domaine).filter_by(url_base=url_base).first()
-        
-        if domaine:
-            # Si le domaine existe, on peut créer l'objet Page associé
-            # TODO ajouter fonction age
-            ma_page = Page(url=page, contenu_html=contenu_html_page, age=datetime.datetime.now())
-            ma_page.domaine = domaine
+        ma_page = Page(url=page, contenu_html=contenu_html_page, age=lastmod)
+        ma_page.domaine = domaine
 
-            session.add(ma_page)
-            session.commit()
-        
+        session.add(ma_page)
+        session.commit()
+    
         # hrefs = get_hrefs_from_url(page)
         # for href in hrefs:
         #     url_base = get_url_base(href)

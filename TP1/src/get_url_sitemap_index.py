@@ -11,7 +11,7 @@ def get_url_sitemap_index(url):
         url (string): une url plus ou moins longue
 
     Returns:
-        string: protocole + nom de domaine
+        string: protocole + nom de domaine + /sitemap_index.xml
     """
     # Extrait la partie de base de l'URL (sans le chemin spécifique)
     parsed_url = urlparse(url)
