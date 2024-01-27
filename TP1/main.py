@@ -1,5 +1,6 @@
 import importlib
 import datetime
+import time
 from sqlalchemy.exc import IntegrityError
 from src.get_url_base import get_url_base
 from src.is_allowed_by_robots import is_allowed_by_robots
@@ -9,7 +10,7 @@ from src.create_session import create_session
 from urllib.parse import urlparse
 from requetes.create_domaine import create_domaine
 from requetes.create_page import create_page
-
+from src.compter_pages_d_un_domaine import compter_pages_d_un_domaine
 
 # Pour vider toutes les tables au démarrage du programme
 session, engine = create_session()
@@ -49,7 +50,7 @@ except ValueError:
 
 ##### INITIALISATION DES REFERENTIELS #####
 set_sites_interdits = set()
-set_frontière = set()
+set_frontiere = set()
 set_url_pages= set()
 set_domaines=set()
 
@@ -62,29 +63,43 @@ nombre_pages_stockées = len(set_url_pages)
 print(f'Il y a {nombre_pages_stockées} pages en base pour le domaine {url}')
 # Constitution de la liste des sites interdits
 
-# frontières_base = récupérer frontières en base
-# for url in frontieres_base:
-    # set_frontiere.add(url)
+frontieres_base = session.query(Frontiere.url).all()
 
-# SI mon url est interdite, alors je l'enlève de la frontière
+for url in frontieres_base:
+    set_frontiere.add(url)
+
+# SI une url est interdite, alors je l'enlève de la frontière
 # POUR CHAQUE url dans frontières_bases:
+for url in frontieres_base:
     # url_base = récupérer url du domaine
-    # est_autorisé = True
+    url_base = get_url_base(url)
+    est_autorise = True
     # SI url_base in site_interdits:
-        # est_autorisé = False
-    # est_autorisé = is_allowed_by_robots()
+    if url_base in set_sites_interdits:
+        est_autorise = False
+        set_frontiere.remove(url)
+        
+    est_autorise = is_allowed_by_robots()
     # SI est_autorisé == False:
-        # 
+    if est_autorise == False:
+        set_frontiere.remove(url)
+
 ##### FIN INITIALISATION DES REFERENTIELS #####
+max_nb_pages_stockees=50
 
-
-# TANT QUE nombre_pages_stockées < max_nb_pages_stockées FAIRE:
+pages_stockees = session.query(Page.url).all()
+nombre_pages_stockees = len(pages_stockees)
+# TANT QUE nombre_pages_stockees < max_nb_pages_stockees FAIRE:
+while nombre_pages_stockees < max_nb_pages_stockees:
     # WAIT 3 secondes
-
+    time.sleep(3)
     # SI mon url est autorisée (robotparser gère le cas des erreurs 400 et disallow dans ce cas):
+    if is_allowed_by_robots(url):
         # J'arrive sur une url
         # Vérifier combien de pages de ce domaines j'ai déjà
+        url_base = get_url_base
         # Initialiser le compteur nombre_pages_du_domaine à ce nombre.
+        nombre_pages_du_domaine = compter_pages_d_un_domaine(url_base, session)
         # SI le compteur < max_pages_par_domaine ALORS:
             # Je vérifie que mon url n'est pas dans url_pages
             # SI url not in url_pages (sinon je passe à la suite) ALORS:
@@ -113,7 +128,7 @@ print(f'Il y a {nombre_pages_stockées} pages en base pour le domaine {url}')
         # Pour recommencer le processus je vais chercher une nouvelle url dans la frontiere
         # url = prends une url au hasard dans frontiere
         
-
+    nombre_pages_stockees +=1
 # N'oubliez pas de fermer la session après avoir terminé
 session.close()
 

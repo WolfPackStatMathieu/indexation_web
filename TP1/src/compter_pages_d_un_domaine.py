@@ -11,7 +11,7 @@ session appropriée.
     """
 
 from sqlalchemy.orm import joinedload
-from classes.classes import Domaine, Page
+from src.classes.classes import Domaine, Page
 
 def compter_pages_d_un_domaine(url_domaine, session):
     # Rechercher le domaine correspondant à l'url_domaine
