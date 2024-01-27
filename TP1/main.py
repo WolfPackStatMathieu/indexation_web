@@ -63,18 +63,19 @@ except ValueError:
 set_sites_interdits = set()
 set_frontière = set()
 set_url_pages= set()
-set_href=set()
+set_domaines=set()
 
 # url_pages = [] # récupérer la liste des url des pages en base
 # for url_page in url_pages:
     # set_url_pages.add(url)
-    
+# nombre_pages_stockées = len(set_url_pages) 
+
+
 # Constitution de la liste des sites interdits
 
 # frontières_base = récupérer frontières en base
 # for url in frontieres_base:
     # set_frontiere.add(url)
-
 
 # SI mon url est interdite, alors je l'enlève de la frontière
 # POUR CHAQUE url dans frontières_bases:
@@ -88,22 +89,41 @@ set_href=set()
 ##### FIN INITIALISATION DES REFERENTIELS #####
 
 
-# WAIT 3 secondes
+# TANT QUE nombre_pages_stockées < max_nb_pages_stockées FAIRE:
+    # WAIT 3 secondes
 
-# SI mon url est autorisée:
-    # J'arrive sur une url
-    # Je vérifie que mon url n'est pas dans url_pages
-    # SI url not in url_pages:
-        # je récupère la page et la charge en base
-        # hrefs = je récupère les hrefs présents sur la page
+    # SI mon url est autorisée (robotparser gère le cas des erreurs 400 et disallow dans ce cas):
+        # J'arrive sur une url
+        # Vérifier combien de pages de ce domaines j'ai déjà
+        # Initialiser le compteur nombre_pages_du_domaine à ce nombre.
+        # SI le compteur < max_pages_par_domaine ALORS:
+            # Je vérifie que mon url n'est pas dans url_pages
+            # SI url not in url_pages (sinon je passe à la suite) ALORS:
+                # je récupère la page et la charge en base
+                
+                # hrefs = je récupère les hrefs présents sur la page
+                
+                # --- Tri entre hrefs autorisés et interdits
+                # POUR CHAQUE Href dans hrefs:
+                    # url_base = get_url_base(href)
+                    # SI url_base in site_interdits ALORS:
+                        # je ne fais rien
+                    # SINON:
+                        # je vérifie que le site est autorisé
+                        # SI le site est autorisé ALORS:
+                            # J'ajoute Href à set_frontiere: set_frontiere.add(Href)
+                        # FIN SI
+                    # FIN SI
+                # FIN POUR
+            # FIN SI
+        # SINON:
+            # Supprimer les url de Frontière et de set_frontiere
+        # FIN SI
+
+    # SINON:
+        # Pour recommencer le processus je vais chercher une nouvelle url dans la frontiere
+        # url = prends une url au hasard dans frontiere
         
-        # --- Tri entre hrefs autorisés et interdits
-        # POUR CHAQUE Href dans hrefs:
-            # url_base = get_url_base(href)
-            # SI url_base in site_interdits:
-
-# SINON:
-    # je vais
 
 # N'oubliez pas de fermer la session après avoir terminé
 session.close()
