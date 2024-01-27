@@ -8,19 +8,23 @@ from src.classes.classes import Base, Page, Domaine, Frontiere
 from src.create_session import create_session
 from urllib.parse import urlparse
 from requetes.create_domaine import create_domaine
+from requetes.create_page import create_page
 
-
-session, engine = create_session()
 
 # Pour vider toutes les tables au démarrage du programme
-Base.metadata.drop_all(bind=engine)
 session, engine = create_session()
-# Appeler la fonction d'initialisation pour le domaine
-domaine_1 = create_domaine(session, 'https://ensai.fr')
+Base.metadata.drop_all(bind=engine)
+# on réétablit une session
+session, engine = create_session()
 
-page_example = Page(url="http://example.com/page1", contenu_html="<html>...</html>", age=datetime.datetime.now(), domaine_id= domaine_1.id)
-session.add(page_example)
-session.commit()
+# Appeler la fonction d'initialisation pour le domaine
+# domaine_1 = create_domaine(session, 'https://ensai.fr')
+
+# Utiliser la fonction pour ajouter une page
+# url_page = 'http://example.com/page1'
+# contenu_html_page = "<html>...</html>"
+# page_example = create_page(session, url_page, contenu_html_page, domaine_1)
+
 ###### FIN phase d'initialisation ######################################################""
 
 
