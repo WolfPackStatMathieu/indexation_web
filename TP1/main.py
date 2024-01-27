@@ -7,42 +7,26 @@ from src.get_urls_recursively import get_urls_recursively
 from src.classes.classes import Base, Page, Domaine, Frontiere
 from src.create_session import create_session
 from urllib.parse import urlparse
+from requetes.create_domaine import create_domaine
 
 
-
-session = create_session()
+session, engine = create_session()
 
 # Pour vider toutes les tables au démarrage du programme
 Base.metadata.drop_all(bind=engine)
+session, engine = create_session()
+# Appeler la fonction d'initialisation pour le domaine
+domaine_1 = create_domaine(session, 'https://ensai.fr')
 
-try:
-    # Phase d'initialisation
-    url = 'https://ensai.fr'
-    url_base = get_url_base(url)
-    is_allowed = is_allowed_by_robots(url)
-
-    domaine_1 = Domaine(url_base=url_base)
-    session.add(domaine_1)
-    session.commit()
-
-except IntegrityError as e:
-    print(f"Erreur d'intégrité : {e}")
-    session.rollback()
-
-except Exception as e:
-    print(f"Une erreur s'est produite : {e}")
-    session.rollback()
-
-page_example = Page(url="http://example.com/page1", contenu_html="<html>...</html>", age=datetime.datetime.now())
-page_example.domaine = domaine_1
+page_example = Page(url="http://example.com/page1", contenu_html="<html>...</html>", age=datetime.datetime.now(), domaine_id= domaine_1.id)
 session.add(page_example)
 session.commit()
 ###### FIN phase d'initialisation ######################################################""
 
 
 # demander une adresse à l'utilisateur
-# url='https://ensai.fr'
-
+url='https://ensai.fr'
+# url = input("Veuillez saisir une adresse URL : ")
 while is_allowed_by_robots(url)==False:
     # demander à l'utilisateur une autre adresse
     url = input("Veuillez saisir une adresse URL : ")
@@ -66,11 +50,12 @@ set_url_pages= set()
 set_domaines=set()
 
 # url_pages = [] # récupérer la liste des url des pages en base
-# for url_page in url_pages:
-    # set_url_pages.add(url)
-# nombre_pages_stockées = len(set_url_pages) 
+url_pages = session.query(Page.url).all()
+for url_page in url_pages:
+    set_url_pages.add(url)
+nombre_pages_stockées = len(set_url_pages) 
 
-
+print(f'Il y a {nombre_pages_stockées} pages en base pour le domaine {url}')
 # Constitution de la liste des sites interdits
 
 # frontières_base = récupérer frontières en base

@@ -8,5 +8,6 @@ def create_session():
     engine = create_engine(db_path, echo=True)
     Base.metadata.create_all(bind=engine)
     Session = sessionmaker(bind=engine)
+    session = Session()
     print("######## SESSION CREATED ########")
-    return Session()
+    return session, engine
