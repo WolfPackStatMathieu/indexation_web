@@ -2,4 +2,4 @@
 
 ## Diagramme de Classes
 
-![Diagramme de Classes](doc/diagramme_de_classes.drawio.svg)
+![Diagramme de Classes](TP1/doc/diagramme_de_classes.drawio.svg)
