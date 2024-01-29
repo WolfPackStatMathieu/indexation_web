@@ -4,10 +4,10 @@ from datetime import datetime
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 
-def create_page(session, url, contenu_html, domaine):
+def create_page(session, url, contenu_html, domaine, age):
     try:
         # Phase d'initialisation
-        page_example = Page(url=url, contenu_html=contenu_html, age=datetime.now(), domaine=domaine)
+        page_example = Page(url=url, contenu_html=contenu_html, age=age, domaine=domaine)
         session.add(page_example)
         session.commit()
         print(f"La page {url} a été ajoutée en base pour le domaine {domaine.url_base}")

@@ -3,9 +3,10 @@ from bs4 import BeautifulSoup
 from http.client import IncompleteRead
 import sys
 sys.path.append("..")
-from get_url_base import get_url_base
-from get_urls_recursively import get_urls_recursively
-from get_url_sitemap_index import get_url_sitemap_index
+from src.get_url_base import get_url_base
+from src.get_urls_recursively import get_urls_recursively
+from src.get_url_sitemap_index import get_url_sitemap_index
+import datetime
 
 def get_last_modified_date_of_url(url_input):
     """retourne la date de dernière modification d'une url
@@ -14,7 +15,7 @@ def get_last_modified_date_of_url(url_input):
         url_input (string): adresse url
 
     Returns:
-        date: date de dernière modification
+        date: date de dernière modification, now() si non trouvée
     """
     base_url = get_url_base(url_input)
     sitemap_url = get_url_sitemap_index(base_url)
@@ -23,8 +24,8 @@ def get_last_modified_date_of_url(url_input):
     for url, last_modified in all_urls_with_dates:
         if url == url_input:
             return last_modified
-    
-    return "Date de dernière modification non trouvée pour l'URL spécifiée."
+    print(f"Date de dernière modification non trouvée pour l'URL {url_input} spécifiée.")
+    return datetime.datetime.now()
 
 
 if __name__ == '__main__':

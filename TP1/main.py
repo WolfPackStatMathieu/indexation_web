@@ -1,6 +1,7 @@
 import importlib
 import datetime
 import time
+import random
 from sqlalchemy.exc import IntegrityError
 from src.get_url_base import get_url_base
 from src.is_allowed_by_robots import is_allowed_by_robots
@@ -11,6 +12,9 @@ from urllib.parse import urlparse
 from requetes.create_domaine import create_domaine
 from requetes.create_page import create_page
 from src.compter_pages_d_un_domaine import compter_pages_d_un_domaine
+from src.fetch_url import fetch_url
+from src.get_age import get_last_modified_date_of_url
+from src.get_hrefs_from_url import get_hrefs_from_url
 
 # Pour vider toutes les tables au démarrage du programme
 session, engine = create_session()
@@ -21,10 +25,10 @@ session, engine = create_session()
 # Appeler la fonction d'initialisation pour le domaine
 domaine_1 = create_domaine(session, 'https://ensai.fr')
 
-# Utiliser la fonction pour ajouter une page
-url_page = 'http://example.com/page12'
-contenu_html_page = "<html>...</html>"
-page_example = create_page(session, url_page, contenu_html_page, domaine_1)
+# # Utiliser la fonction pour ajouter une page
+# url_page = 'http://example.com/page12'
+# contenu_html_page = "<html>...</html>"
+# page_example = create_page(session, url_page, contenu_html_page, domaine_1)
 
 ###### FIN phase d'initialisation ######################################################""
 
@@ -85,7 +89,7 @@ for url in frontieres_base:
         set_frontiere.remove(url)
 
 ##### FIN INITIALISATION DES REFERENTIELS #####
-max_nb_pages_stockees=5
+max_nb_pages_stockees=10
 
 pages_stockees = session.query(Page.url).all()
 nombre_pages_stockees = len(pages_stockees)
@@ -93,6 +97,7 @@ nombre_pages_stockees = len(pages_stockees)
 while nombre_pages_stockees < max_nb_pages_stockees:
     # WAIT 3 secondes
     time.sleep(1)
+    print(f'ON PARSE : {url}')
     # SI mon url est autorisée (robotparser gère le cas des erreurs 400 et disallow dans ce cas):
     if is_allowed_by_robots(url):
         # J'arrive sur une url
@@ -101,37 +106,67 @@ while nombre_pages_stockees < max_nb_pages_stockees:
         # Initialiser le compteur nombre_pages_du_domaine à ce nombre.
         nombre_pages_du_domaine = compter_pages_d_un_domaine(url_base, session)
         print(nombre_pages_du_domaine)
-        # SI le compteur < max_pages_par_domaine ALORS:
+        # SI le compteur < max_nb_pages_stockees ALORS:
+        if nombre_pages_du_domaine < max_nb_pages_stockees:
             # Je vérifie que mon url n'est pas dans url_pages
+            mon_url_est_deja_stockee = False
+            if url in url_pages:
+                mon_url_est_deja_stockee = True
             # SI url not in url_pages (sinon je passe à la suite) ALORS:
+            if not mon_url_est_deja_stockee:
                 # je récupère la page et la charge en base
-                
+                contenu_html = fetch_url(url)
+                age_url = get_last_modified_date_of_url(url)
                 # hrefs = je récupère les hrefs présents sur la page
+                hrefs = get_hrefs_from_url(url)
                 
+                domaine_1 = create_domaine(session, url)
+                
+                url_page = url
+                contenu_html_page = contenu_html
+                age_url = get_last_modified_date_of_url(url)
+                page_example = create_page(session, url_page, contenu_html_page, domaine_1, age = age_url)
                 # --- Tri entre hrefs autorisés et interdits
                 # POUR CHAQUE Href dans hrefs:
-                    # url_base = get_url_base(href)
+                for href in hrefs:
+                    url_base = get_url_base(href)
                     # SI url_base in site_interdits ALORS:
+                    if url_base not in set_sites_interdits:
                         # je ne fais rien
                     # SINON:
                         # je vérifie que le site est autorisé
+                        est_autorise = is_allowed_by_robots(url)
                         # SI le site est autorisé ALORS:
+                        if est_autorise:
                             # J'ajoute Href à set_frontiere: set_frontiere.add(Href)
+                            set_frontiere.add(href)
                         # FIN SI
                     # FIN SI
                 # FIN POUR
             # FIN SI
         # SINON:
             # Supprimer les url de Frontière et de set_frontiere
+            set_frontiere.discard(url)
         # FIN SI
 
     # SINON:
         # Pour recommencer le processus je vais chercher une nouvelle url dans la frontiere
         # url = prends une url au hasard dans frontiere
+    url = random.choice(list(set_frontiere))
         
     nombre_pages_stockees +=1
     print(f'nombre de pages stockées: {nombre_pages_stockees}')
 # N'oubliez pas de fermer la session après avoir terminé
+
+# Récupération des domaines depuis la base de données
+domaines = session.query(Domaine.url_base).all()
+
+# Écriture des domaines dans le fichier crawled_webpages.txt
+with open('crawled_webpages.txt', 'w') as fichier:
+    for domaine in domaines:
+        fichier.write(f"{domaine.url_base}\n")
+        
+        
 session.close()
 
 
