@@ -19,12 +19,12 @@ Base.metadata.drop_all(bind=engine)
 session, engine = create_session()
 
 # Appeler la fonction d'initialisation pour le domaine
-# domaine_1 = create_domaine(session, 'https://ensai.fr')
+domaine_1 = create_domaine(session, 'https://ensai.fr')
 
 # Utiliser la fonction pour ajouter une page
-# url_page = 'http://example.com/page1'
-# contenu_html_page = "<html>...</html>"
-# page_example = create_page(session, url_page, contenu_html_page, domaine_1)
+url_page = 'http://example.com/page12'
+contenu_html_page = "<html>...</html>"
+page_example = create_page(session, url_page, contenu_html_page, domaine_1)
 
 ###### FIN phase d'initialisation ######################################################""
 
