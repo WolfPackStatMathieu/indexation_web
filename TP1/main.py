@@ -178,7 +178,8 @@ while nombre_pages_stockees < max_nb_pages_stockees:
                 set_frontiere.discard(url) # je supprime l'url choisie au hasard de ma frontière pour ne pas retomber dessus
                 url = random.choice(list(set_frontiere)) # j'en prends une autre
                 adresse_valide = True # je quitte ma boucle
-            
+        # Si le domaine est None, c'est que je n'ai pas de page de ce domaine
+        adresse_valide = True # je quitte ma boucle    
             
     
     print(f'nombre de pages stockées: {nombre_pages_stockees}')
