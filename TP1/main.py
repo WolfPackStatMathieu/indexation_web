@@ -99,7 +99,8 @@ while nombre_pages_stockees < max_nb_pages_stockees:
     time.sleep(1)
     print(f'ON PARSE : {url}')
     # SI mon url est autorisée (robotparser gère le cas des erreurs 400 et disallow dans ce cas):
-    if is_allowed_by_robots(url):
+    est_autorise = is_allowed_by_robots(url)
+    if est_autorise:
         # J'arrive sur une url
         # Vérifier combien de pages de ce domaines j'ai déjà
         url_base = get_url_base(url)
@@ -120,12 +121,18 @@ while nombre_pages_stockees < max_nb_pages_stockees:
                 # hrefs = je récupère les hrefs présents sur la page
                 hrefs = get_hrefs_from_url(url)
                 
-                domaine_1 = create_domaine(session, url)
-                
+                # on gère la création de Domaine
+                result = None
+                result = session.query(Domaine).filter_by(url_base=get_url_base(url)).first()
+                if result is None:
+                    domaine_1 = create_domaine(session, url)
+                    
+                domaine_id = session.query(Domaine).filter_by(url_base=get_url_base(url)).first()
+                domaine_id = domaine_id.id
                 url_page = url
                 contenu_html_page = contenu_html
                 age_url = get_last_modified_date_of_url(url)
-                page_example = create_page(session, url_page, contenu_html_page, domaine_1, age = age_url)
+                page_example = create_page(session, url_page, contenu_html_page, domaine_id, age = age_url)
                 # --- Tri entre hrefs autorisés et interdits
                 # POUR CHAQUE Href dans hrefs:
                 for href in hrefs:
@@ -135,7 +142,7 @@ while nombre_pages_stockees < max_nb_pages_stockees:
                         # je ne fais rien
                     # SINON:
                         # je vérifie que le site est autorisé
-                        est_autorise = is_allowed_by_robots(url)
+                        # est_autorise = is_allowed_by_robots(url)
                         # SI le site est autorisé ALORS:
                         if est_autorise:
                             # J'ajoute Href à set_frontiere: set_frontiere.add(Href)
@@ -159,12 +166,12 @@ while nombre_pages_stockees < max_nb_pages_stockees:
 # N'oubliez pas de fermer la session après avoir terminé
 
 # Récupération des domaines depuis la base de données
-domaines = session.query(Domaine.url_base).all()
+pages = session.query(Page.url).all()
 
 # Écriture des domaines dans le fichier crawled_webpages.txt
 with open('crawled_webpages.txt', 'w') as fichier:
-    for domaine in domaines:
-        fichier.write(f"{domaine.url_base}\n")
+    for page in pages:
+        fichier.write(f"{page.url}\n")
         
         
 session.close()
