@@ -23,8 +23,10 @@ def get_last_modified_date_of_url(url_input):
     
     for url, last_modified in all_urls_with_dates:
         if url == url_input:
-            return last_modified
+            date = datetime.strptime(last_modified, '%m/%d/%y %H:%M:%S')
+            return date
     print(f"Date de dernière modification non trouvée pour l'URL {url_input} spécifiée.")
+    
     return datetime.datetime.now()
 
 
@@ -32,3 +34,4 @@ if __name__ == '__main__':
     url = "https://ensai.fr/"
     last_modified_date = get_last_modified_date_of_url(url)
     print(f"Date de dernière modification pour {url} : {last_modified_date}")
+    print(type(last_modified_date))

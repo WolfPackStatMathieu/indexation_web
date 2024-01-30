@@ -133,6 +133,7 @@ while nombre_pages_stockees < max_nb_pages_stockees:
                 contenu_html_page = contenu_html
                 age_url = get_last_modified_date_of_url(url)
                 page_example = create_page(session, url_page, contenu_html_page, domaine_id, age = age_url)
+                nombre_pages_stockees +=1
                 # --- Tri entre hrefs autorisés et interdits
                 # POUR CHAQUE Href dans hrefs:
                 for href in hrefs:
@@ -161,7 +162,7 @@ while nombre_pages_stockees < max_nb_pages_stockees:
         # url = prends une url au hasard dans frontiere
     url = random.choice(list(set_frontiere))
         
-    nombre_pages_stockees +=1
+    
     print(f'nombre de pages stockées: {nombre_pages_stockees}')
 # N'oubliez pas de fermer la session après avoir terminé
 
