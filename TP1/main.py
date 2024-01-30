@@ -98,6 +98,7 @@ while nombre_pages_stockees < max_nb_pages_stockees:
     # WAIT 3 secondes
     time.sleep(1)
     print(f'ON PARSE : {url}')
+    pages_stockees = session.query(Page.url).all()
     # SI mon url est autorisée (robotparser gère le cas des erreurs 400 et disallow dans ce cas):
     est_autorise = is_allowed_by_robots(url)
     if est_autorise:
@@ -160,8 +161,21 @@ while nombre_pages_stockees < max_nb_pages_stockees:
     # SINON:
         # Pour recommencer le processus je vais chercher une nouvelle url dans la frontiere
         # url = prends une url au hasard dans frontiere
+    
     url = random.choice(list(set_frontiere))
-        
+    adresse_valide = False
+    while adresse_valide == False:
+        domaine_id = session.query(Domaine).filter_by(url_base=get_url_base(url)).first()
+        if domaine_id is not None:
+            domaine_id = domaine_id.id
+            pages_stockees_url_base = session.query(Page.url).filter_by(domaine_id=domaine_id).all()
+
+            if len(pages_stockees_url_base) >= 5:
+                set_frontiere.discard(url)
+                url = random.choice(list(set_frontiere))
+            else:
+                adresse_valide = True
+            
     
     print(f'nombre de pages stockées: {nombre_pages_stockees}')
 # N'oubliez pas de fermer la session après avoir terminé

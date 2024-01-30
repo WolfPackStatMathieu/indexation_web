@@ -20,10 +20,12 @@ def get_last_modified_date_of_url(url_input):
     base_url = get_url_base(url_input)
     sitemap_url = get_url_sitemap_index(base_url)
     all_urls_with_dates = get_urls_recursively(sitemap_url)
-    url_input_slash = url_input + '/'
+    
+    if not url_input.endswith('/'):
+        url_input += '/'
     for url, last_modified in all_urls_with_dates:
-        if url == url_input_slash:
-            date = datetime.strptime(last_modified, '%m/%d/%y %H:%M:%S')
+        if url == url_input:
+            date = datetime.datetime.strptime(last_modified, "%Y-%m-%dT%H:%M:%S%z")
             return date
     print(f"Date de dernière modification non trouvée pour l'URL {url_input} spécifiée.")
     
