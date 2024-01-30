@@ -162,21 +162,23 @@ while nombre_pages_stockees < max_nb_pages_stockees:
         # Pour recommencer le processus je vais chercher une nouvelle url dans la frontiere
         # url = prends une url au hasard dans frontiere
     
-    url = random.choice(list(set_frontiere))
-    adresse_valide = False
+    
+    url = random.choice(list(set_frontiere)) # je prends une adresse au hasard dans la frontière 
+    adresse_valide = False # j'initialise (peut être inutile ou mal placé)
     while adresse_valide == False:
-        url_base = get_url_base(url)
+        url_base = get_url_base(url) # je récupère l'adresse du domaine
         
-        domaine = session.query(Domaine).filter_by(url_base=url).first()
+        domaine = session.query(Domaine).filter_by(url_base=url).first() # je tente de récupérer le domaine s'il existe en base
         if domaine is not None:
-            domaine_id = domaine.id
+            domaine_id = domaine.id # je chope l'id 
+            # je récupère les Pages liées à ce domaine
             pages_stockees_url_base = session.query(Page.url).filter_by(domaine_id=domaine_id).all()
-
+            # si j'ai plus de 5 pages ALORS:
             if len(pages_stockees_url_base) >= 5:
-                set_frontiere.discard(url)
-                url = random.choice(list(set_frontiere))
-            else:
-                adresse_valide = True
+                set_frontiere.discard(url) # je supprime l'url choisie au hasard de ma frontière pour ne pas retomber dessus
+                url = random.choice(list(set_frontiere)) # j'en prends une autre
+                adresse_valide = True # je quitte ma boucle
+            
             
     
     print(f'nombre de pages stockées: {nombre_pages_stockees}')
