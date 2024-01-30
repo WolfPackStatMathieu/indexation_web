@@ -26,11 +26,11 @@ def get_last_modified_date_of_url(url_input):
     for url, last_modified in all_urls_with_dates:
         if url == url_input:
             try:
-                date = datetime.strptime(last_modified, "%Y-%m-%dT%H:%M:%S%z")
+                date = datetime.datetime.strptime(last_modified, "%Y-%m-%dT%H:%M:%S%z")
             except ValueError as e:
                 print(f"Erreur lors de la conversion : {e}")
                 # Si une erreur se produit, utilisez la date et l'heure actuelles
-                date = datetime.now()
+                date = datetime.datetime.now()
             return date
     print(f"Date de dernière modification non trouvée pour l'URL {url_input} spécifiée.")
     

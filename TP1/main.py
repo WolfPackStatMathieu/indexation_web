@@ -15,6 +15,8 @@ from src.compter_pages_d_un_domaine import compter_pages_d_un_domaine
 from src.fetch_url import fetch_url
 from src.get_age import get_last_modified_date_of_url
 from src.get_hrefs_from_url import get_hrefs_from_url
+from src.is_valid_url import is_valid_url
+
 
 # Pour vider toutes les tables au démarrage du programme
 session, engine = create_session()
@@ -71,7 +73,7 @@ frontieres_base = session.query(Frontiere.url).all()
 
 for url in frontieres_base:
     set_frontiere.add(url)
-
+set_frontiere.discard('')
 # SI une url est interdite, alors je l'enlève de la frontière
 # POUR CHAQUE url dans frontières_bases:
 for url in frontieres_base:
@@ -100,8 +102,9 @@ while nombre_pages_stockees < max_nb_pages_stockees:
     print(f'ON PARSE : {url}')
     pages_stockees = session.query(Page.url).all()
     # SI mon url est autorisée (robotparser gère le cas des erreurs 400 et disallow dans ce cas):
-    est_autorise = is_allowed_by_robots(url)
-    if est_autorise:
+    print(url)
+    
+    if is_valid_url(url) and is_allowed_by_robots(url):
         # J'arrive sur une url
         # Vérifier combien de pages de ce domaines j'ai déjà
         url_base = get_url_base(url)
@@ -146,7 +149,7 @@ while nombre_pages_stockees < max_nb_pages_stockees:
                         # je vérifie que le site est autorisé
                         # est_autorise = is_allowed_by_robots(url)
                         # SI le site est autorisé ALORS:
-                        if est_autorise:
+                        if is_allowed_by_robots(url_base):
                             # J'ajoute Href à set_frontiere: set_frontiere.add(Href)
                             set_frontiere.add(href)
                         # FIN SI
@@ -177,7 +180,12 @@ while nombre_pages_stockees < max_nb_pages_stockees:
             if len(pages_stockees_url_base) >= 5:
                 set_frontiere.discard(url) # je supprime l'url choisie au hasard de ma frontière pour ne pas retomber dessus
                 url = random.choice(list(set_frontiere)) # j'en prends une autre
+                while not is_valid_url(url):
+                    print(f"l'url {url} n'est pas valide")
+                    set_frontiere.discard(url)
+                    url = random.choice(list(set_frontiere)) # j'en prends une autre
                 adresse_valide = True # je quitte ma boucle
+                
         # Si le domaine est None, c'est que je n'ai pas de page de ce domaine
         adresse_valide = True # je quitte ma boucle    
             
