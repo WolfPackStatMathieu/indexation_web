@@ -165,9 +165,11 @@ while nombre_pages_stockees < max_nb_pages_stockees:
     url = random.choice(list(set_frontiere))
     adresse_valide = False
     while adresse_valide == False:
-        domaine_id = session.query(Domaine).filter_by(url_base=get_url_base(url)).first()
-        if domaine_id is not None:
-            domaine_id = domaine_id.id
+        url_base = get_url_base(url)
+        
+        domaine = session.query(Domaine).filter_by(url_base=url).first()
+        if domaine is not None:
+            domaine_id = domaine.id
             pages_stockees_url_base = session.query(Page.url).filter_by(domaine_id=domaine_id).all()
 
             if len(pages_stockees_url_base) >= 5:
