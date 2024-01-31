@@ -56,6 +56,7 @@ except ValueError:
 
 ##### INITIALISATION DES REFERENTIELS #####
 set_sites_interdits = set()
+set_sites_interdits.add('')
 set_frontiere = set()
 set_url_pages= set()
 set_domaines=set()
