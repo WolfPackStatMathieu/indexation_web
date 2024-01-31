@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import urllib.robotparser
 from urllib.parse import  urlparse, urlunparse
-from get_url_base import *
+from src.get_url_base import *
 
 def get_hrefs_from_url(url):
     """Récupère tous les liens (hrefs) d'une page.

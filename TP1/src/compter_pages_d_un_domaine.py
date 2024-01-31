@@ -11,7 +11,7 @@ session appropriée.
     """
 
 from sqlalchemy.orm import joinedload
-from classes.classes import Domaine, Page
+from src.classes.classes import Domaine, Page
 
 def compter_pages_d_un_domaine(url_domaine, session):
     # Rechercher le domaine correspondant à l'url_domaine
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     from sqlalchemy import create_engine
     
     # Création de la base de données et de la structure
-    engine = create_engine('sqlite:///example.db', echo=True)
+    engine = create_engine('sqlite:///example.db', echo=False)
     Base = declarative_base()
     Base.metadata.create_all(bind=engine)
     
