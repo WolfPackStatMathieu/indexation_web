@@ -14,13 +14,18 @@ def is_allowed_by_robots(url):
     Returns:
         bolean: True si le robot est autorisé, False sinon
     """
-    base_url = get_url_base(url)
-    rp = urllib.robotparser.RobotFileParser()
-    rp.set_url(base_url + "/robots.txt")
-    rp.read()
-    print(f'le site {base_url} est autorisé: {rp.can_fetch("*", url)}')
-    return rp.can_fetch("*", url)
+    try:
+        base_url = get_url_base(url)
+        rp = urllib.robotparser.RobotFileParser()
+        rp.set_url(base_url + "/robots.txt")
+        rp.read()
+        print(f'Le site {base_url} est autorisé: {rp.can_fetch("*", url)}')
+        return rp.can_fetch("*", url)
+    except Exception as e:
+        print(f"Erreur lors de la lecture de robots.txt pour {base_url}: {e}")
+        return False
 
+    
 if __name__ == '__main__':
     import urllib.robotparser
     seed_url_1 = "https://www.google.com/search?client=ubuntu-sn&hs=e7I&sca_esv=601333276&channel=fs&sxsrf=ACQVn08mcrS3-Wxpc4KwrYZiAY9740BWjQ:1706167319592&q=structure+d'un+lien+url&tbm=isch&source=lnms&sa=X&ved=2ahUKEwjhzYvIgPiDAxWbcKQEHcJVAQIQ0pQJegQICBAB&biw=2066&bih=1049&dpr=0.9"

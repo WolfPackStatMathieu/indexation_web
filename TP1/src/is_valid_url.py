@@ -18,7 +18,11 @@ def is_valid_url(url):
         valid_netloc = bool(result.netloc)
         # Exclut certaines URLs spécifiques, comme "/robots.txt"
         excluded_paths = ["/robots.txt", ""]
-        excluded_url = result.path not in excluded_paths
+        excluded_url = (
+        result.path not in excluded_paths
+        or result.path[:1] == "#"
+        or not result.path[:4] == "www."
+        )
         print(excluded_paths)
 
         return valid_scheme and valid_netloc and not excluded_url

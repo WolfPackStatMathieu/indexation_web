@@ -57,6 +57,7 @@ except ValueError:
 ##### INITIALISATION DES REFERENTIELS #####
 set_sites_interdits = set()
 set_sites_interdits.add('')
+set_sites_autorises = set()
 set_frontiere = set()
 set_url_pages= set()
 set_domaines=set()
@@ -87,9 +88,12 @@ for url in frontieres_base:
         set_frontiere.remove(url)
         
     est_autorise = is_allowed_by_robots()
+    
     # SI est_autorisé == False:
     if est_autorise == False:
         set_frontiere.remove(url)
+    else:
+        set_sites_autorises.add(url)
 
 ##### FIN INITIALISATION DES REFERENTIELS #####
 max_nb_pages_stockees=10
@@ -105,9 +109,10 @@ while nombre_pages_stockees < max_nb_pages_stockees:
     # SI mon url est autorisée (robotparser gère le cas des erreurs 400 et disallow dans ce cas):
     print(url)
     
-    if is_valid_url(url) and is_allowed_by_robots(url):
+    if is_valid_url(url) and (url in set_sites_autorises or is_allowed_by_robots(url)):
         # J'arrive sur une url
         # Vérifier combien de pages de ce domaines j'ai déjà
+        print("ICI2")
         url_base = get_url_base(url)
         # Initialiser le compteur nombre_pages_du_domaine à ce nombre.
         nombre_pages_du_domaine = compter_pages_d_un_domaine(url_base, session)
@@ -116,6 +121,7 @@ while nombre_pages_stockees < max_nb_pages_stockees:
         if nombre_pages_du_domaine < max_nb_pages_stockees:
             # Je vérifie que mon url n'est pas dans url_pages
             mon_url_est_deja_stockee = False
+            url_pages = session.query(Page.url).all()
             if url in url_pages:
                 mon_url_est_deja_stockee = True
             # SI url not in url_pages (sinon je passe à la suite) ALORS:
@@ -142,23 +148,34 @@ while nombre_pages_stockees < max_nb_pages_stockees:
                 # --- Tri entre hrefs autorisés et interdits
                 # POUR CHAQUE Href dans hrefs:
                 for href in hrefs:
-                    url_base = get_url_base(href)
-                    # SI url_base in site_interdits ALORS:
-                    if url_base not in set_sites_interdits:
-                        # je ne fais rien
-                    # SINON:
-                        # je vérifie que le site est autorisé
-                        # est_autorise = is_allowed_by_robots(url)
-                        # SI le site est autorisé ALORS:
-                        if is_allowed_by_robots(url_base):
-                            # J'ajoute Href à set_frontiere: set_frontiere.add(Href)
-                            set_frontiere.add(href)
+                    try:
+                        url_base = get_url_base(href)
+                        # SI url_base in site_interdits ALORS:
+                        if url_base not in set_sites_interdits:
+                            # je ne fais rien
+                            pass
+                        # SINON:
+                        else:
+                            # je vérifie que le site est autorisé
+                            # est_autorise = is_allowed_by_robots(url)
+                            # SI le site est autorisé ALORS:
+                            if (url_base in set_sites_autorises or is_allowed_by_robots(url_base)) and href not in set_frontiere:
+                                # J'ajoute Href à set_frontiere: set_frontiere.add(Href)
+                                print(url_base)
+                                set_frontiere.add(href)
+                                set_sites_autorises.add(url_base)
+                    except Exception as e:
+                        print(f"Erreur lors du traitement de l'URL {href}: {e}")
+                        # Vous pouvez choisir de traiter l'erreur d'une manière spécifique ou simplement passer à l'URL suivante.
+                        # Si vous voulez ignorer l'URL en cas d'erreur, vous pouvez utiliser 'continue'.
+
                         # FIN SI
                     # FIN SI
                 # FIN POUR
             # FIN SI
         # SINON:
             # Supprimer les url de Frontière et de set_frontiere
+        else:
             set_frontiere.discard(url)
         # FIN SI
 
@@ -167,9 +184,11 @@ while nombre_pages_stockees < max_nb_pages_stockees:
         # url = prends une url au hasard dans frontiere
     
     
-    url = random.choice(list(set_frontiere)) # je prends une adresse au hasard dans la frontière 
+    # url = random.choice(list(set_frontiere)) # je prends une adresse au hasard dans la frontière 
+    url = next(iter(set_frontiere), None)
+
     adresse_valide = False # j'initialise (peut être inutile ou mal placé)
-    while adresse_valide == False:
+    while adresse_valide == False or url is not None:
         url_base = get_url_base(url) # je récupère l'adresse du domaine
         
         domaine = session.query(Domaine).filter_by(url_base=url).first() # je tente de récupérer le domaine s'il existe en base

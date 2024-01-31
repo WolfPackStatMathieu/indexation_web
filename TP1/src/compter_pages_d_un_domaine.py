@@ -43,7 +43,7 @@ if __name__ == '__main__':
     from sqlalchemy import create_engine
     
     # Création de la base de données et de la structure
-    engine = create_engine('sqlite:///example.db', echo=True)
+    engine = create_engine('sqlite:///example.db', echo=False)
     Base = declarative_base()
     Base.metadata.create_all(bind=engine)
     
